@@ -9,7 +9,7 @@ namespace OpenDatabase
     public class JsonFormatter
     {
 
-        public static string Format(string s)
+        public static string Format(string s, bool excludeZero = false)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -82,7 +82,40 @@ namespace OpenDatabase
                         sb.Append(' ');
                 }
             }
-            return sb.ToString();
+
+            string temp = sb.ToString();
+            StringBuilder output = new StringBuilder();
+            if (excludeZero)
+            {
+                string[] lines = temp.Replace("\r", "").Split('\n');
+                for(int i = 0; i<lines.Length; i++)
+                {
+                    string line = lines[i];
+                    if (line.Contains("\": 0")) continue;
+                    output.AppendLine(line);
+                }
+                string _tmp = output.ToString().Replace("\r", "").Replace("\n", "").Replace(": ", ":").Replace("\t", "");
+                output = new StringBuilder();
+                for(int i = 0; i<_tmp.Length;i++)
+                {
+                    char c_current = _tmp[i];
+                    char c_next = ' ';
+
+                    if (i+1<_tmp.Length)
+                    {
+                        c_next = _tmp[i + 1];
+                    }
+
+                    if (c_next == '}' || c_next == ']')
+                    {
+                        if (c_current == ',') continue;
+                    }
+
+                    output.Append(c_current);
+                }
+            }
+
+            return  (!excludeZero) ? sb.ToString() : Format(output.ToString());
         }
     }
 }
