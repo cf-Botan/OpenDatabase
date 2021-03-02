@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenDatabase
+namespace OpenDatabase.Utilities.Formatter
 {
     public class JsonFormatter
     {
