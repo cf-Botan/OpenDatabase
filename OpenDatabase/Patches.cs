@@ -75,6 +75,7 @@ namespace OpenDatabase
                 Console.instance.AddString("Database has been reloaded!");
             }
         }
+
         static JItemData GetItemDataFromItemDrop(ItemDrop.ItemData data)
         {
             JItemData itemData;
@@ -292,11 +293,10 @@ namespace OpenDatabase
 
         static string GetHexFromColor(Color color)
         {
-            int r = (int)(color.r * 255);
-            int g = (int)(color.g * 255);
-            int b = (int)(color.b * 255);
-            int a = (int)(color.a * 255);
-            return $"#{r.ToString("X2")}{g.ToString("X2")}{b.ToString("X2")}{a.ToString("X2")}";
+            return $"#{(int)(color.r * 255):X2}" +
+                $"{(int)(color.g * 255):X2}" +
+                $"{(int)(color.b * 255):X2}" +
+                $"{(int)(color.a * 255):X2}";
         }
 
         static void ReloadRecipes()

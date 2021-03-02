@@ -67,11 +67,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OpenDatabase.cs" />
-    <Compile Include="JsonFormatter.cs" />
-    <Compile Include="JSONHandler.cs" />
-    <Compile Include="JSONParser.cs" />
-    <Compile Include="JSONWriter.cs" />
-    <Compile Include="Logging.cs" />
+    <Compile Include="Utilities\JsonFormatter.cs" />
+    <Compile Include="TinyJson\JSONHandler.cs" />
+    <Compile Include="TinyJson\JSONParser.cs" />
+    <Compile Include="TinyJson\JSONWriter.cs" />
+    <Compile Include="Utilities\Logging.cs" />
     <Compile Include="Patches.cs" />
     <Compile Include="PluginInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
