@@ -16,21 +16,27 @@ namespace OpenDatabase
 
         public JSONHandler()
         {
+            CheckIntegrity();
+        }
 
+        public static void CheckIntegrity()
+        {
             if (!Directory.Exists(OpenDatabase.jsonFolder))
             {
                 needUpdate = true;
                 Directory.CreateDirectory(OpenDatabase.jsonFolder);
                 Directory.CreateDirectory(OpenDatabase.recipeFolder);
-            } else
+            }
+            else
             {
                 if (Directory.GetFiles(OpenDatabase.recipeFolder).Length <= 0)
                     needUpdate = true;
             }
         }
-
         public void LoadRecipes()
         {
+            CheckIntegrity();
+
             recipes = new List<JRecipe>();
             string[] files = Directory.GetFiles(OpenDatabase.recipeFolder);
             foreach (string f in files)

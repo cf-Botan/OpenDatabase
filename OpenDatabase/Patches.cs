@@ -1,8 +1,13 @@
-﻿using HarmonyLib;
+﻿using BepInEx.Logging;
+using HarmonyLib;
+using System;
+using System.Linq;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace OpenDatabase
 {
@@ -18,15 +23,6 @@ namespace OpenDatabase
             if (gameObject == null) return null;
             return gameObject.GetComponent<ItemDrop>();
         }
-
-        static GameObject getGameObjectById(string id)
-        {
-            GameObject gameObject = ObjectDB.instance.GetItemPrefab(id);
-
-            if (gameObject == null) return null;
-            return gameObject;
-        }
-
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Player), "Load")]
@@ -55,7 +51,187 @@ namespace OpenDatabase
             ReloadRecipes();
             
         }
-        
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Console), "InputText")]
+        static void ConsoleTextInput()
+        {
+            string command = Console.instance.m_input.text.ToLower();
+            if (command.StartsWith("help"))
+            {
+                Console.instance.AddString("");
+                Console.instance.AddString("[OpenDatabase]");
+                Console.instance.AddString("opendatabase.reload - Reloads the database");
+            }
+            if (command == "opendatabase.reload")
+            {
+                if (SceneManager.GetActiveScene().name != "main")
+                {
+                    Console.instance.AddString("You need to be in a world to use this command!");
+                    return;
+                }
+                Console.instance.AddString("Reloading database...");
+                ReloadRecipes();
+                Console.instance.AddString("Database has been reloaded!");
+            }
+        }
+        static JItemData GetItemDataFromItemDrop(ItemDrop.ItemData data)
+        {
+            JItemData itemData;
+            
+            JDamages damages = new JDamages()
+            {
+                m_blunt = data.m_shared.m_damages.m_blunt,
+                m_chop = data.m_shared.m_damages.m_chop,
+                m_damage = data.m_shared.m_damages.m_damage,
+                m_fire = data.m_shared.m_damages.m_fire,
+                m_frost = data.m_shared.m_damages.m_frost,
+                m_lightning = data.m_shared.m_damages.m_frost,
+                m_pickaxe = data.m_shared.m_damages.m_pickaxe,
+                m_pierce = data.m_shared.m_damages.m_pierce,
+                m_poison = data.m_shared.m_damages.m_poison,
+                m_slash = data.m_shared.m_damages.m_slash,
+                m_spirit = data.m_shared.m_damages.m_spirit
+            };
+            if (damages.m_blunt == 0 && damages.m_chop == 0 && damages.m_damage == 0 && damages.m_fire == 0 && damages.m_frost == 0 && damages.m_lightning == 0 &&
+                damages.m_pickaxe == 0 && damages.m_pierce == 0 && damages.m_poison == 0 && damages.m_slash == 0 && damages.m_spirit == 0
+                )
+                damages = null;
+
+            JDamages damagesPerLevel = new JDamages()
+            {
+                m_blunt = data.m_shared.m_damagesPerLevel.m_blunt,
+                m_chop = data.m_shared.m_damagesPerLevel.m_chop,
+                m_damage = data.m_shared.m_damagesPerLevel.m_damage,
+                m_fire = data.m_shared.m_damagesPerLevel.m_fire,
+                m_frost = data.m_shared.m_damagesPerLevel.m_frost,
+                m_lightning = data.m_shared.m_damagesPerLevel.m_frost,
+                m_pickaxe = data.m_shared.m_damagesPerLevel.m_pickaxe,
+                m_pierce = data.m_shared.m_damagesPerLevel.m_pierce,
+                m_poison = data.m_shared.m_damagesPerLevel.m_poison,
+                m_slash = data.m_shared.m_damagesPerLevel.m_slash,
+                m_spirit = data.m_shared.m_damagesPerLevel.m_spirit
+            };
+            if (damagesPerLevel.m_blunt == 0 && damagesPerLevel.m_chop == 0 && damagesPerLevel.m_damage == 0 && damagesPerLevel.m_fire == 0 && damagesPerLevel.m_frost == 0 && damagesPerLevel.m_lightning == 0 &&
+                damagesPerLevel.m_pickaxe == 0 && damagesPerLevel.m_pierce == 0 && damagesPerLevel.m_poison == 0 && damagesPerLevel.m_slash == 0 && damagesPerLevel.m_spirit == 0
+                )
+                damagesPerLevel = null;
+
+
+            itemData = new JItemData()
+            {
+                m_armor = data.m_shared.m_armor,
+                m_armorPerLevel = data.m_shared.m_armorPerLevel,
+                m_blockPower = data.m_shared.m_blockPower,
+                m_blockPowerPerLevel = data.m_shared.m_blockPowerPerLevel,
+                m_deflectionForce = data.m_shared.m_deflectionForce,
+                m_deflectionForcePerLevel = data.m_shared.m_deflectionForcePerLevel,
+                m_description = data.m_shared.m_description,
+                m_durabilityDrain = data.m_shared.m_durabilityDrain,
+                m_durabilityPerLevel = data.m_shared.m_durabilityPerLevel,
+                m_equipDuration = data.m_shared.m_equipDuration,
+                m_food = data.m_shared.m_food,
+                m_foodColor = GetHexFromColor(data.m_shared.m_foodColor),
+                m_foodBurnTime = data.m_shared.m_foodBurnTime,
+                m_foodRegen = data.m_shared.m_foodRegen,
+                m_foodStamina = data.m_shared.m_foodStamina,
+                m_holdDurationMin = data.m_shared.m_holdDurationMin,
+                m_holdStaminaDrain = data.m_shared.m_holdStaminaDrain,
+                m_maxDurability = data.m_shared.m_maxDurability,
+                m_maxQuality = data.m_shared.m_maxQuality,
+                m_maxStackSize = data.m_shared.m_maxStackSize,
+                m_toolTier = data.m_shared.m_toolTier,
+                m_useDurability = data.m_shared.m_useDurability,
+                m_useDurabilityDrain = data.m_shared.m_useDurabilityDrain,
+                m_value = data.m_shared.m_value,
+                m_weight = data.m_shared.m_weight,
+                m_destroyBroken = data.m_shared.m_destroyBroken,
+                m_dodgeable = data.m_shared.m_dodgeable,
+                m_canBeReparied = data.m_shared.m_canBeReparied,
+                m_damages = damages,
+                m_damagesPerLevel = damagesPerLevel,
+                m_name = data.m_shared.m_name,
+                m_questItem = data.m_shared.m_questItem,
+                m_teleportable = data.m_shared.m_teleportable,
+                m_timedBlockBonus = data.m_shared.m_timedBlockBonus
+            };
+            if (itemData.m_food == 0 && itemData.m_foodRegen == 0 && itemData.m_foodStamina == 0)
+                itemData.m_foodColor = null;
+            return itemData;
+        }
+
+        static void SetItemDropDataFromJItemData(ref ItemDrop.ItemData itemData, JItemData data)
+        {
+            if (data.m_damages != null)
+            {
+                HitData.DamageTypes damages = new HitData.DamageTypes();
+                damages.m_blunt = data.m_damages.m_blunt;
+                damages.m_chop = data.m_damages.m_chop;
+                damages.m_damage = data.m_damages.m_damage;
+                damages.m_frost = data.m_damages.m_frost;
+                damages.m_lightning = data.m_damages.m_lightning;
+                damages.m_pickaxe = data.m_damages.m_pickaxe;
+                damages.m_pierce = data.m_damages.m_pierce;
+                damages.m_poison = data.m_damages.m_poison;
+                damages.m_slash = data.m_damages.m_slash;
+                damages.m_spirit = data.m_damages.m_spirit;
+                itemData.m_shared.m_damages = damages;
+            }
+
+            if (data.m_damagesPerLevel != null)
+            {
+                HitData.DamageTypes damagesPerLevel = new HitData.DamageTypes();
+                damagesPerLevel.m_blunt = data.m_damagesPerLevel.m_blunt;
+                damagesPerLevel.m_chop = data.m_damagesPerLevel.m_chop;
+                damagesPerLevel.m_damage = data.m_damagesPerLevel.m_damage;
+                damagesPerLevel.m_frost = data.m_damagesPerLevel.m_frost;
+                damagesPerLevel.m_lightning = data.m_damagesPerLevel.m_lightning;
+                damagesPerLevel.m_pickaxe = data.m_damagesPerLevel.m_pickaxe;
+                damagesPerLevel.m_pierce = data.m_damagesPerLevel.m_pierce;
+                damagesPerLevel.m_poison = data.m_damagesPerLevel.m_poison;
+                damagesPerLevel.m_slash = data.m_damagesPerLevel.m_slash;
+                damagesPerLevel.m_spirit = data.m_damagesPerLevel.m_spirit;
+                itemData.m_shared.m_damagesPerLevel = damagesPerLevel;
+            }
+
+
+            itemData.m_shared.m_name = data.m_name;
+            itemData.m_shared.m_description = data.m_description;
+            itemData.m_shared.m_weight = data.m_weight;
+            itemData.m_shared.m_maxStackSize = data.m_maxStackSize;
+            itemData.m_shared.m_food = data.m_food;
+            itemData.m_shared.m_foodStamina = data.m_foodStamina;
+            itemData.m_shared.m_foodRegen = data.m_foodRegen;
+            itemData.m_shared.m_foodBurnTime = data.m_foodBurnTime;
+
+            if (data.m_foodColor != null && data.m_foodColor != "" && data.m_foodColor.StartsWith("#"))
+                itemData.m_shared.m_foodColor = GetColorFromHex(data.m_foodColor);
+
+            itemData.m_shared.m_armor = data.m_armor;
+            itemData.m_shared.m_armorPerLevel = data.m_armorPerLevel;
+            itemData.m_shared.m_blockPower = data.m_blockPower;
+            itemData.m_shared.m_blockPowerPerLevel = data.m_blockPowerPerLevel;
+            itemData.m_shared.m_canBeReparied = data.m_canBeReparied;
+            itemData.m_shared.m_timedBlockBonus = data.m_timedBlockBonus;
+            itemData.m_shared.m_deflectionForce = data.m_deflectionForce;
+            itemData.m_shared.m_deflectionForcePerLevel = data.m_deflectionForcePerLevel;
+            itemData.m_shared.m_destroyBroken = data.m_destroyBroken;
+            itemData.m_shared.m_dodgeable = data.m_dodgeable;
+            itemData.m_shared.m_maxDurability = data.m_maxDurability;
+            itemData.m_shared.m_durabilityDrain = data.m_durabilityDrain;
+            itemData.m_shared.m_durabilityPerLevel = data.m_durabilityPerLevel;
+            itemData.m_shared.m_equipDuration = data.m_equipDuration;
+            itemData.m_shared.m_holdDurationMin = data.m_holdDurationMin;
+            itemData.m_shared.m_holdStaminaDrain = data.m_holdStaminaDrain;
+            itemData.m_shared.m_maxQuality = data.m_maxQuality;
+            itemData.m_shared.m_useDurability = data.m_useDurability;
+            itemData.m_shared.m_useDurabilityDrain = data.m_useDurabilityDrain;
+            itemData.m_shared.m_questItem = data.m_questItem;
+            itemData.m_shared.m_teleportable = data.m_teleportable;
+            itemData.m_shared.m_toolTier = data.m_toolTier;
+            itemData.m_shared.m_value = data.m_value;
+        }
+
         static void CreateRecipesFiles()
         {
             foreach (Recipe recipe in ObjectDB.instance.m_recipes)
@@ -66,7 +242,6 @@ namespace OpenDatabase
                 JRecipe jr = new JRecipe();
                 jr.itemData = new JItemData();
 
-                jr.itemData.m_name = recipe.m_item.m_itemData.m_shared.m_name;
                 jr.result_item_id = recipe.m_item.gameObject.name;
                 jr.result_amount = recipe.m_amount;
 
@@ -88,119 +263,7 @@ namespace OpenDatabase
 
                 if (OpenDatabase.deepJsonCreation)
                 {
-                    ItemDrop.ItemData data = recipe.m_item.m_itemData;
-                    JDamages damages = new JDamages()
-                    {
-                        m_blunt = data.m_shared.m_damages.m_blunt,
-                        m_chop = data.m_shared.m_damages.m_chop,
-                        m_damage = data.m_shared.m_damages.m_damage,
-                        m_fire = data.m_shared.m_damages.m_fire,
-                        m_frost = data.m_shared.m_damages.m_frost,
-                        m_lightning = data.m_shared.m_damages.m_frost,
-                        m_pickaxe = data.m_shared.m_damages.m_pickaxe,
-                        m_pierce = data.m_shared.m_damages.m_pierce,
-                        m_poison = data.m_shared.m_damages.m_poison,
-                        m_slash = data.m_shared.m_damages.m_slash,
-                        m_spirit = data.m_shared.m_damages.m_spirit
-                    };
-
-                    JDamages damagesPerLevel = new JDamages()
-                    {
-                        m_blunt = data.m_shared.m_damagesPerLevel.m_blunt,
-                        m_chop = data.m_shared.m_damagesPerLevel.m_chop,
-                        m_damage = data.m_shared.m_damagesPerLevel.m_damage,
-                        m_fire = data.m_shared.m_damagesPerLevel.m_fire,
-                        m_frost = data.m_shared.m_damagesPerLevel.m_frost,
-                        m_lightning = data.m_shared.m_damagesPerLevel.m_frost,
-                        m_pickaxe = data.m_shared.m_damagesPerLevel.m_pickaxe,
-                        m_pierce = data.m_shared.m_damagesPerLevel.m_pierce,
-                        m_poison = data.m_shared.m_damagesPerLevel.m_poison,
-                        m_slash = data.m_shared.m_damagesPerLevel.m_slash,
-                        m_spirit = data.m_shared.m_damagesPerLevel.m_spirit
-                    };
-                    jr.itemData = new JItemData();
-
-                    if (data.m_shared.m_armor > 0)
-                        jr.itemData.m_armor = data.m_shared.m_armor;
-
-                    if (data.m_shared.m_armorPerLevel > 0)
-                        jr.itemData.m_armorPerLevel = data.m_shared.m_armorPerLevel;
-
-                    if (data.m_shared.m_blockPower > 0)
-                        jr.itemData.m_blockPower = data.m_shared.m_blockPower;
-
-                    if (data.m_shared.m_blockPowerPerLevel > 0)
-                        jr.itemData.m_blockPowerPerLevel = data.m_shared.m_blockPowerPerLevel;
-
-                    if (data.m_shared.m_deflectionForce > 0)
-                        jr.itemData.m_deflectionForce = data.m_shared.m_deflectionForce;
-
-                    if (data.m_shared.m_deflectionForcePerLevel > 0)
-                        jr.itemData.m_deflectionForcePerLevel = data.m_shared.m_deflectionForcePerLevel;
-
-                    if (data.m_shared.m_description != "")
-                        jr.itemData.m_description = data.m_shared.m_description;
-
-                    if (data.m_shared.m_durabilityDrain > 0)
-                        jr.itemData.m_durabilityDrain = data.m_shared.m_durabilityDrain;
-
-                    if (data.m_shared.m_durabilityPerLevel > 0)
-                        jr.itemData.m_durabilityPerLevel = data.m_shared.m_durabilityPerLevel;
-
-                    if (data.m_shared.m_equipDuration > 0)
-                        jr.itemData.m_equipDuration = data.m_shared.m_equipDuration;
-
-                    if (data.m_shared.m_food > 0)
-                        jr.itemData.m_food = data.m_shared.m_food;
-
-                    if (data.m_shared.m_foodBurnTime > 0)
-                        jr.itemData.m_foodBurnTime = data.m_shared.m_foodBurnTime;
-
-                    if (data.m_shared.m_foodRegen > 0)
-                        jr.itemData.m_foodRegen = data.m_shared.m_foodRegen;
-
-                    if (data.m_shared.m_foodStamina > 0)
-                        jr.itemData.m_foodStamina = data.m_shared.m_foodStamina;
-
-                    if (data.m_shared.m_holdDurationMin > 0)
-                        jr.itemData.m_holdDurationMin = data.m_shared.m_holdDurationMin;
-
-                    if (data.m_shared.m_holdStaminaDrain > 0)
-                        jr.itemData.m_holdStaminaDrain = data.m_shared.m_holdStaminaDrain;
-
-                    if (data.m_shared.m_maxDurability > 0)
-                        jr.itemData.m_maxDurability = data.m_shared.m_maxDurability;
-
-                    if (data.m_shared.m_maxQuality > 0)
-                        jr.itemData.m_maxQuality = data.m_shared.m_maxQuality;
-
-                    if (data.m_shared.m_maxStackSize > 0)
-                        jr.itemData.m_maxStackSize = data.m_shared.m_maxStackSize;
-
-                    if (data.m_shared.m_toolTier > 0)
-                        jr.itemData.m_toolTier = data.m_shared.m_toolTier;
-
-                    jr.itemData.m_useDurability = data.m_shared.m_useDurability;
-
-                    if (data.m_shared.m_useDurabilityDrain > 0)
-                        jr.itemData.m_useDurabilityDrain = data.m_shared.m_useDurabilityDrain;
-
-                    if (data.m_shared.m_value > 0)
-                        jr.itemData.m_value = data.m_shared.m_value;
-
-                    if (data.m_shared.m_weight > 0)
-                        jr.itemData.m_weight = data.m_shared.m_weight;
-
-                    jr.itemData.m_foodColor = null;
-                    jr.itemData.m_destroyBroken = data.m_shared.m_destroyBroken;
-                    jr.itemData.m_dodgeable = data.m_shared.m_dodgeable;
-                    jr.itemData.m_canBeReparied = data.m_shared.m_canBeReparied;
-                    jr.itemData.m_damages = damages;
-                    jr.itemData.m_damagesPerLevel = damagesPerLevel;
-                    jr.itemData.m_name = data.m_shared.m_name;
-                    jr.itemData.m_questItem = data.m_shared.m_questItem;
-                    jr.itemData.m_teleportable = data.m_shared.m_teleportable;
-                    jr.itemData.m_timedBlockBonus = data.m_shared.m_timedBlockBonus;
+                    jr.itemData = GetItemDataFromItemDrop(recipe.m_item.m_itemData);
                 }
 
                 string json = TinyJson.JSONWriter.ToJson(jr);
@@ -212,13 +275,39 @@ namespace OpenDatabase
             JSONHandler.needUpdate = false;
         }
 
+        static Color GetColorFromHex(string hex)
+        {
+            hex = hex.TrimStart('#');
+            Color c = new Color(255,0,0);
+            if (hex.Length >= 6)
+            {
+                c.r = int.Parse(hex.Substring(0, 2), NumberStyles.HexNumber);
+                c.g = int.Parse(hex.Substring(2, 2), NumberStyles.HexNumber);
+                c.b = int.Parse(hex.Substring(4, 2), NumberStyles.HexNumber);
+                if (hex.Length == 8)
+                    c.a = int.Parse(hex.Substring(6, 2), NumberStyles.HexNumber);
+            }
+            return c;
+        }
+
+        static string GetHexFromColor(Color color)
+        {
+            int r = (int)(color.r * 255);
+            int g = (int)(color.g * 255);
+            int b = (int)(color.b * 255);
+            int a = (int)(color.a * 255);
+            return $"#{r.ToString("X2")}{g.ToString("X2")}{b.ToString("X2")}{a.ToString("X2")}";
+        }
+
         static void ReloadRecipes()
         {
+            JSONHandler.CheckIntegrity();
             if (JSONHandler.needUpdate)
             {
                 CreateRecipesFiles();
             }
 
+            
             OpenDatabase.JsonInstance().LoadRecipes();
             if (craftingStations == null)
             {
@@ -232,7 +321,7 @@ namespace OpenDatabase
                         craftingStations.Add(recipe.m_repairStation.m_name, recipe.m_repairStation);
                 }
 
-                Logging.Log($"Found {craftingStations.Count} Crafting/Repair-Stations.");
+                Logging.Log($"Found {craftingStations.Count} Crafting/Repair-Stations. [{string.Join(", ", craftingStations.Select(x => x.Key).ToArray())}]");
             }
 
             foreach (Recipe recipe in ObjectDB.instance.m_recipes)
@@ -243,73 +332,7 @@ namespace OpenDatabase
                 if (jRecipe != null)
                 {
                     ItemDrop _result = getItemById(jRecipe.result_item_id);
-
-                    if (jRecipe.itemData.m_damages != null)
-                    {
-                        HitData.DamageTypes damages = new HitData.DamageTypes();
-                        damages.m_blunt = jRecipe.itemData.m_damages.m_blunt;
-                        damages.m_chop = jRecipe.itemData.m_damages.m_chop;
-                        damages.m_damage = jRecipe.itemData.m_damages.m_damage;
-                        damages.m_frost = jRecipe.itemData.m_damages.m_frost;
-                        damages.m_lightning = jRecipe.itemData.m_damages.m_lightning;
-                        damages.m_pickaxe = jRecipe.itemData.m_damages.m_pickaxe;
-                        damages.m_pierce = jRecipe.itemData.m_damages.m_pierce;
-                        damages.m_poison = jRecipe.itemData.m_damages.m_poison;
-                        damages.m_slash = jRecipe.itemData.m_damages.m_slash;
-                        damages.m_spirit = jRecipe.itemData.m_damages.m_spirit;
-                        _result.m_itemData.m_shared.m_damages = damages;
-                    }
-
-                    if (jRecipe.itemData.m_damagesPerLevel != null)
-                    {
-                        HitData.DamageTypes damagesPerLevel = new HitData.DamageTypes();
-                        damagesPerLevel.m_blunt = jRecipe.itemData.m_damagesPerLevel.m_blunt;
-                        damagesPerLevel.m_chop = jRecipe.itemData.m_damagesPerLevel.m_chop;
-                        damagesPerLevel.m_damage = jRecipe.itemData.m_damagesPerLevel.m_damage;
-                        damagesPerLevel.m_frost = jRecipe.itemData.m_damagesPerLevel.m_frost;
-                        damagesPerLevel.m_lightning = jRecipe.itemData.m_damagesPerLevel.m_lightning;
-                        damagesPerLevel.m_pickaxe = jRecipe.itemData.m_damagesPerLevel.m_pickaxe;
-                        damagesPerLevel.m_pierce = jRecipe.itemData.m_damagesPerLevel.m_pierce;
-                        damagesPerLevel.m_poison = jRecipe.itemData.m_damagesPerLevel.m_poison;
-                        damagesPerLevel.m_slash = jRecipe.itemData.m_damagesPerLevel.m_slash;
-                        damagesPerLevel.m_spirit = jRecipe.itemData.m_damagesPerLevel.m_spirit;
-                        _result.m_itemData.m_shared.m_damagesPerLevel = damagesPerLevel;
-                    }
-
-
-                    _result.m_itemData.m_shared.m_name = jRecipe.itemData.m_name;
-                    _result.m_itemData.m_shared.m_description = jRecipe.itemData.m_description;
-                    _result.m_itemData.m_shared.m_weight = jRecipe.itemData.m_weight;
-                    _result.m_itemData.m_shared.m_maxStackSize = jRecipe.itemData.m_maxStackSize;
-                    _result.m_itemData.m_shared.m_food = jRecipe.itemData.m_food;
-                    _result.m_itemData.m_shared.m_foodStamina = jRecipe.itemData.m_foodStamina;
-                    _result.m_itemData.m_shared.m_foodRegen = jRecipe.itemData.m_foodRegen;
-                    _result.m_itemData.m_shared.m_foodBurnTime = jRecipe.itemData.m_foodBurnTime;
-                    //_result.m_itemData.m_shared.m_foodColor = ;
-                    _result.m_itemData.m_shared.m_armor = jRecipe.itemData.m_armor;
-                    _result.m_itemData.m_shared.m_armorPerLevel = jRecipe.itemData.m_armorPerLevel;
-                    _result.m_itemData.m_shared.m_blockPower = jRecipe.itemData.m_blockPower;
-                    _result.m_itemData.m_shared.m_blockPowerPerLevel = jRecipe.itemData.m_blockPowerPerLevel;
-                    _result.m_itemData.m_shared.m_canBeReparied = jRecipe.itemData.m_canBeReparied;
-                    _result.m_itemData.m_shared.m_timedBlockBonus = jRecipe.itemData.m_timedBlockBonus;
-                    _result.m_itemData.m_shared.m_deflectionForce = jRecipe.itemData.m_deflectionForce;
-                    _result.m_itemData.m_shared.m_deflectionForcePerLevel = jRecipe.itemData.m_deflectionForcePerLevel;
-                    _result.m_itemData.m_shared.m_destroyBroken = jRecipe.itemData.m_destroyBroken;
-                    _result.m_itemData.m_shared.m_dodgeable = jRecipe.itemData.m_dodgeable;
-                    _result.m_itemData.m_shared.m_maxDurability = jRecipe.itemData.m_maxDurability;
-                    _result.m_itemData.m_shared.m_durabilityDrain = jRecipe.itemData.m_durabilityDrain;
-                    _result.m_itemData.m_shared.m_durabilityPerLevel = jRecipe.itemData.m_durabilityPerLevel;
-                    _result.m_itemData.m_shared.m_equipDuration = jRecipe.itemData.m_equipDuration;
-                    _result.m_itemData.m_shared.m_holdDurationMin = jRecipe.itemData.m_holdDurationMin;
-                    _result.m_itemData.m_shared.m_holdStaminaDrain = jRecipe.itemData.m_holdStaminaDrain;
-                    _result.m_itemData.m_shared.m_maxQuality = jRecipe.itemData.m_maxQuality;
-                    _result.m_itemData.m_shared.m_useDurability = jRecipe.itemData.m_useDurability;
-                    _result.m_itemData.m_shared.m_useDurabilityDrain = jRecipe.itemData.m_useDurabilityDrain;
-                    _result.m_itemData.m_shared.m_questItem = jRecipe.itemData.m_questItem;
-                    _result.m_itemData.m_shared.m_teleportable = jRecipe.itemData.m_teleportable;
-                    _result.m_itemData.m_shared.m_toolTier = jRecipe.itemData.m_toolTier;
-                    _result.m_itemData.m_shared.m_value = jRecipe.itemData.m_value;
-
+                    SetItemDropDataFromJItemData(ref _result.m_itemData, jRecipe.itemData);
 
                     recipe.m_amount = jRecipe.result_amount;
                     recipe.m_item = _result;
@@ -341,12 +364,8 @@ namespace OpenDatabase
                         recipe.m_resources[i].m_amount = jRecipe.ingredients[i].amount;
                         recipe.m_resources[i].m_resItem = _drop;
                     }
-
-                    
                 }
             }
-
-            //Traverse.Create(ObjectDB.instance).Method("UpdateItemHashes").GetValue();
         }
 
     }

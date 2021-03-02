@@ -61,6 +61,9 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>E:\BepIn\BepInExPack_Valheim\unstripped_corlib\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>E:\BepIn\BepInExPack_Valheim\unstripped_corlib\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OpenDatabase.cs" />

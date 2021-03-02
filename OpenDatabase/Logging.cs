@@ -12,6 +12,7 @@ namespace OpenDatabase
         private static ManualLogSource _logsource = Logger.CreateLogSource("OpenDatabase");
         public static void Log(object obj, LogLevel level = LogLevel.Info)
         {
+
             _logsource.Log(level, obj);
         }
 
