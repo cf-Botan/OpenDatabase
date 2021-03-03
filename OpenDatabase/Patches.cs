@@ -1,32 +1,21 @@
 ﻿using HarmonyLib;
-using System.Linq;
-using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
 using UnityEngine.SceneManagement;
-using OpenDatabase.Utilities;
-using OpenDatabase.Utilities.Formatter;
+using OpenDatabase.Handler;
 
 namespace OpenDatabase
 {
     [HarmonyPatch]
     class Patches
     {
-        static Dictionary<string, CraftingStation> craftingStations;
 
-        static ItemDrop getItemById(string id)
-        {
-            GameObject gameObject = ObjectDB.instance.GetItemPrefab(id);
-
-            if (gameObject == null) return null;
-            return gameObject.GetComponent<ItemDrop>();
-        }
-
+        static bool askedForYesNo = false;
+        
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Player), "Load")]
         static void UpdateKnown()
         {
             if (SceneManager.GetActiveScene().name != "main") return;
+
             Player.m_localPlayer.UpdateKnownRecipesList();
         }
 
@@ -36,7 +25,9 @@ namespace OpenDatabase
         {
 
             if (SceneManager.GetActiveScene().name != "main") return;
-            ReloadRecipes();
+
+            ItemsHandler.ReloadItems();
+            RecipesHandler.ReloadRecipes();
 
         }
 
@@ -46,7 +37,9 @@ namespace OpenDatabase
         {
 
             if (SceneManager.GetActiveScene().name != "main") return;
-            ReloadRecipes();
+
+            ItemsHandler.ReloadItems();
+            RecipesHandler.ReloadRecipes();
             
         }
 
@@ -55,136 +48,99 @@ namespace OpenDatabase
         static void ConsoleTextInput()
         {
             string command = Console.instance.m_input.text.ToLower();
+            string _command = command;
+            if (askedForYesNo) command = Console.instance.m_lastEntry;
             if (command.StartsWith("help"))
             {
                 Console.instance.AddString("");
                 Console.instance.AddString("[OpenDatabase]");
+                Console.instance.AddString("opendatabase.generate all/items/recipes");
                 Console.instance.AddString("opendatabase.reload - Reloads the database");
             }
-            if (command == "opendatabase.reload")
+
+            if (command.Contains("opendatabase"))
             {
                 if (SceneManager.GetActiveScene().name != "main")
                 {
                     Console.instance.AddString("You need to be in a world to use this command!");
                     return;
                 }
+            }
+
+            if (command == "opendatabase.reload")
+            {
                 Console.instance.AddString("Reloading database...");
-                ReloadRecipes();
+
+                ItemsHandler.ReloadItems();
+                RecipesHandler.ReloadRecipes();
+
+                if (Player.m_localPlayer != null)
+                    Player.m_localPlayer.UpdateKnownRecipesList();
+
                 Console.instance.AddString("Database has been reloaded!");
-            }
-        }
-
-        static void CreateRecipesFiles()
-        {
-            foreach (Recipe recipe in ObjectDB.instance.m_recipes)
+            } 
+            else if (command.StartsWith("opendatabase.generate"))
             {
-                if (recipe.m_item == null) continue;
-                Logging.Log($"Found Recipe '{recipe.m_item.name}'");
-
-                JRecipe jr = new JRecipe();
-                jr.itemData = new JItemData();
-
-                jr.result_item_id = recipe.m_item.gameObject.name;
-                jr.result_amount = recipe.m_amount;
-
-                if (recipe.m_craftingStation != null)
-                    jr.CraftingStation = recipe.m_craftingStation.m_name;
-                if (recipe.m_repairStation != null)
-                    jr.RepairStation = recipe.m_repairStation.m_name;
-
-                jr.minStationLevel = recipe.m_minStationLevel;
-
-                jr.ingredients = new JIngredients[recipe.m_resources.Length];
-                for (int i = 0; i < recipe.m_resources.Length; i++)
+                string[] cmd = command.Split(' ');
+                if (cmd.Length == 2)
                 {
-                    jr.ingredients[i] = new JIngredients();
-
-                    jr.ingredients[i].amount = recipe.m_resources[i].m_amount;
-                    jr.ingredients[i].id = recipe.m_resources[i].m_resItem.gameObject.name;
-                }
-
-                if (OpenDatabase.deepJsonCreation)
-                {
-                    jr.itemData = Helper.GetItemDataFromItemDrop(recipe.m_item.m_itemData);
-                }
-
-                string json = TinyJson.JSONWriter.ToJson(jr);
-                json = JsonFormatter.Format(json, !OpenDatabase.showZerosInJSON.Value);
-                File.WriteAllText(OpenDatabase.recipeFolder + "/" + recipe.name + ".json", json);
-
-            }
-            
-            JSONHandler.needUpdate = false;
-        }
-
-
-        static void ReloadRecipes()
-        {
-            JSONHandler.CheckIntegrity();
-            if (JSONHandler.needUpdate)
-            {
-                CreateRecipesFiles();
-            }
-
-            OpenDatabase.JsonInstance().LoadRecipes();
-            if (craftingStations == null)
-            {
-                craftingStations = new Dictionary<string, CraftingStation>();
-                foreach (Recipe recipe in ObjectDB.instance.m_recipes)
-                {
-                    if (recipe.m_craftingStation != null && !craftingStations.ContainsKey(recipe.m_craftingStation.m_name))
-                        craftingStations.Add(recipe.m_craftingStation.m_name, recipe.m_craftingStation);
-
-                    if (recipe.m_repairStation != null && !craftingStations.ContainsKey(recipe.m_repairStation.m_name))
-                        craftingStations.Add(recipe.m_repairStation.m_name, recipe.m_repairStation);
-                }
-
-                Logging.Log($"Found {craftingStations.Count} Crafting/Repair-Stations. [{string.Join(", ", craftingStations.Select(x => x.Key).ToArray())}]");
-            }
-
-            foreach (Recipe recipe in ObjectDB.instance.m_recipes)
-            {
-                if (recipe.m_item == null) continue;
-
-                JRecipe jRecipe = OpenDatabase.JsonInstance().getById(recipe.m_item.gameObject.name);
-                if (jRecipe != null)
-                {
-                    ItemDrop _result = getItemById(jRecipe.result_item_id);
-                    Helper.SetItemDropDataFromJItemData(ref _result.m_itemData, jRecipe.itemData);
-
-                    recipe.m_amount = jRecipe.result_amount;
-                    recipe.m_item = _result;
-                    recipe.m_resources = new Piece.Requirement[jRecipe.ingredients.Length];
-                    recipe.m_minStationLevel = jRecipe.minStationLevel;
-
-                    if (jRecipe.CraftingStation != null && jRecipe.CraftingStation != "")
+                    if (cmd[1] == "all")
                     {
-                        CraftingStation station = craftingStations[jRecipe.CraftingStation];
-                        if (station != null)
-                            recipe.m_craftingStation = station;
+                        if (!askedForYesNo)
+                        {
+                            Console.instance.AddString("All files inside plugins/OpenDatabase/ will be removed and regenerated. Are you sure ? yes/no");
+                            askedForYesNo = true;
+                        } 
                         else
-                            Logging.LogError($"Couldn't find CraftingStation {jRecipe.CraftingStation}");
+                        {
+                            if (_command == "yes")
+                            {
+                                JSONHandler.ClearFolder(OpenDatabase.recipeFolder);
+                                JSONHandler.ClearFolder(OpenDatabase.itemsFolder);
+                                JSONHandler.CreateItemFiles();
+                                JSONHandler.CreateRecipeFiles();
+                            }
+                            askedForYesNo = false;
+                        }
                     }
-
-                    if (jRecipe.RepairStation != null && jRecipe.RepairStation != "")
+                    else if (cmd[1] == "items")
                     {
-                        CraftingStation station = craftingStations[jRecipe.RepairStation];
-                        if (station != null)
-                            recipe.m_repairStation = station;
+                        if (!askedForYesNo)
+                        {
+                            Console.instance.AddString("All files inside plugins/OpenDatabase/Items will be removed and regenerated. Are you sure ? yes/no");
+                            askedForYesNo = true;
+                        }
                         else
-                            Logging.LogError($"Couldn't find RepairStation {jRecipe.RepairStation}");
+                        {
+                            if (_command == "yes")
+                            {
+                                JSONHandler.ClearFolder(OpenDatabase.itemsFolder);
+                                JSONHandler.CreateItemFiles();
+                            }
+                            askedForYesNo = false;
+                        }
                     }
-
-                    for (int i = 0; i < jRecipe.ingredients.Length; i++)
+                    else if (cmd[1] == "recipes")
                     {
-                        ItemDrop _drop = getItemById(jRecipe.ingredients[i].id);
-                        recipe.m_resources[i] = new Piece.Requirement();
-                        recipe.m_resources[i].m_amount = jRecipe.ingredients[i].amount;
-                        recipe.m_resources[i].m_resItem = _drop;
+                        if (!askedForYesNo)
+                        {
+                            Console.instance.AddString("All files inside plugins/OpenDatabase/Recipes will be removed and regenerated. Are you sure ? yes/no");
+                            askedForYesNo = true;
+                        }
+                        else
+                        {
+                            if (_command == "yes")
+                            {
+                                JSONHandler.ClearFolder(OpenDatabase.recipeFolder);
+                                JSONHandler.CreateRecipeFiles();
+                            }
+                            askedForYesNo = false;
+                        }
                     }
                 }
             }
         }
+  
 
     }
 }

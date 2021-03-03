@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
+using OpenDatabase.Handler;
 using System.IO;
 using System.Reflection;
 
@@ -13,23 +14,14 @@ namespace OpenDatabase
         public static string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static string jsonFolder = Path.Combine(assemblyFolder, "OpenDatabase");
         public static string recipeFolder = Path.Combine(jsonFolder, "Recipes");
-        public static bool deepJsonCreation = true;
+        public static string itemsFolder = Path.Combine(jsonFolder, "Items");
+
 
         public static ConfigEntry<bool> modEnabled;
         public static ConfigEntry<bool> showZerosInJSON;
-
-        private static JSONHandler jSONHandler;
         private static Harmony harmony;
 
 
-        public static JSONHandler JsonInstance(bool doLoad = true)
-        {
-            if (jSONHandler == null)
-                jSONHandler = new JSONHandler();
-
-            return jSONHandler;
-
-        }
         
         public void Awake()
         {
@@ -39,7 +31,7 @@ namespace OpenDatabase
 
             if (!modEnabled.Value) return;
 
-            JsonInstance();
+            JSONHandler.CheckIntegrity();
             harmony = new Harmony(PluginInfo.Guid);
             harmony.PatchAll();
         }

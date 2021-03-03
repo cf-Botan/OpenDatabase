@@ -66,11 +66,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Handler\ItemsHandler.cs" />
+    <Compile Include="Handler\RecipesHandler.cs" />
     <Compile Include="OpenDatabase.cs" />
     <Compile Include="Utilities\ColorUtil.cs" />
     <Compile Include="Utilities\Helper.cs" />
     <Compile Include="Utilities\JsonFormatter.cs" />
-    <Compile Include="Utilities\JSONHandler.cs" />
+    <Compile Include="Handler\JSONHandler.cs" />
     <Compile Include="TinyJson\JSONParser.cs" />
     <Compile Include="TinyJson\JSONWriter.cs" />
     <Compile Include="Utilities\Logging.cs" />

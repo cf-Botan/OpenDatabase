@@ -1,15 +1,9 @@
 ﻿using BepInEx.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace OpenDatabase
 {
-    public static class Logging
+    public static class Logger
     {
-        private static ManualLogSource _logsource = Logger.CreateLogSource("OpenDatabase");
+        private static ManualLogSource _logsource = BepInEx.Logging.Logger.CreateLogSource("OpenDatabase");
         public static void Log(object obj, LogLevel level = LogLevel.Info)
         {
 

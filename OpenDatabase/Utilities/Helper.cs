@@ -1,13 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenDatabase.Handler;
 
 namespace OpenDatabase.Utilities
 {
     public class Helper
     {
+        public static JItemDrop GetItemDataFromItemDrop(ItemDrop drop)
+        {
+            JItemDrop jItemDrop = new JItemDrop();
+            jItemDrop.name = drop.name;
+            jItemDrop.itemData = GetItemDataFromItemDrop(drop.m_itemData);
+            return jItemDrop;
+        }
+
         public static JItemData GetItemDataFromItemDrop(ItemDrop.ItemData data)
         {
             JItemData itemData;
