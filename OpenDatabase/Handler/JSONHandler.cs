@@ -5,6 +5,7 @@ using TinyJson;
 using OpenDatabase.Utilities;
 using OpenDatabase.Utilities.Formatter;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace OpenDatabase.Handler
 {
@@ -12,7 +13,7 @@ namespace OpenDatabase.Handler
     {
         public static List<JRecipe> recipes;
         public static List<JItemDrop> items;
-
+        public static bool wasBlank = false;
 
         public static void CheckIntegrity()
         {
@@ -22,6 +23,7 @@ namespace OpenDatabase.Handler
                 Directory.CreateDirectory(OpenDatabase.jsonFolder);
                 Directory.CreateDirectory(OpenDatabase.recipeFolder);
                 Directory.CreateDirectory(OpenDatabase.itemsFolder);
+                wasBlank = true;
             }
             else
             {
@@ -32,6 +34,13 @@ namespace OpenDatabase.Handler
                     Directory.CreateDirectory(OpenDatabase.itemsFolder);
 
             }
+
+            if (wasBlank)
+            {
+                CreateItemFiles();
+                CreateRecipeFiles();
+            }
+
         }
 
         public static void ClearFolder(string path)
@@ -43,6 +52,8 @@ namespace OpenDatabase.Handler
 
         public static void CreateRecipeFiles()
         {
+            if (SceneManager.GetActiveScene().name != "main") return;
+            wasBlank = false;
             foreach (Recipe recipe in ObjectDB.instance.m_recipes)
             {
                 if (recipe.m_item == null) continue;
@@ -78,7 +89,9 @@ namespace OpenDatabase.Handler
 
         public static void CreateItemFiles()
         {
-            foreach(GameObject obj in ObjectDB.instance.m_items)
+            if (SceneManager.GetActiveScene().name != "main") return;
+            wasBlank = false;
+            foreach (GameObject obj in ObjectDB.instance.m_items)
             {
                 ItemDrop itemDrop = obj.GetComponent<ItemDrop>();
                 if (itemDrop != null)
