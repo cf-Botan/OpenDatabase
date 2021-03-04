@@ -17,10 +17,9 @@ namespace OpenDatabase.Handler
                 if (itemDrop != null)
                 {
                     JItemDrop jItemDrop = JSONHandler.GetJItemDropById(itemDrop.name);
-                    Logger.Log($"Loaded Item {itemDrop.name}");
-
                     if (jItemDrop != null)
                     {
+                        Logger.Log($"Loaded Item {itemDrop.name}");
                         Helper.SetItemDropDataFromJItemData(ref itemDrop.m_itemData, jItemDrop.itemData);
                     }
                 }
