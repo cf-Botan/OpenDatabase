@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using UnityEngine.SceneManagement;
 using OpenDatabase.Handler;
-
+using BepInEx.Configuration;
 namespace OpenDatabase
 {
     [HarmonyPatch]
@@ -54,8 +54,9 @@ namespace OpenDatabase
             {
                 Console.instance.AddString("");
                 Console.instance.AddString("[OpenDatabase]");
-                Console.instance.AddString("opendatabase.generate all/items/recipes");
+                Console.instance.AddString("opendatabase.generate all/items/recipes - Regenerates JSON files");
                 Console.instance.AddString("opendatabase.reload - Reloads the database");
+                Console.instance.AddString("opendatabase.config.reload - Reloads the config file");
             }
 
             if (command.Contains("opendatabase"))
@@ -78,7 +79,28 @@ namespace OpenDatabase
                     Player.m_localPlayer.UpdateKnownRecipesList();
 
                 Console.instance.AddString("Database has been reloaded!");
-            } 
+            }
+            else if (command == "opendatabase.config.reload")
+            {
+                string _text = "";
+                string _enabled;
+
+                bool _en = OpenDatabase.modEnabled.Value;
+                bool _ex = OpenDatabase.showZerosInJSON.Value;
+                OpenDatabase.instance.Config.Reload();
+
+                _enabled = (OpenDatabase.modEnabled.Value) ? "enabled" : "disabled";
+                if (_en != OpenDatabase.modEnabled.Value)
+                    _text = $"The mod has been {_enabled}. ";
+
+                _enabled = (OpenDatabase.showZerosInJSON.Value) ? "shown" : "hidden";
+                if (_ex != OpenDatabase.showZerosInJSON.Value)
+                    _text += $"On JSON generation, zeros are {_enabled}";
+
+                if (_text == "") _text = "Config file has been reloaded";
+
+                Console.instance.AddString(_text);
+            }
             else if (command.StartsWith("opendatabase.generate"))
             {
                 string[] cmd = command.Split(' ');
@@ -90,7 +112,7 @@ namespace OpenDatabase
                         {
                             Console.instance.AddString("All files inside plugins/OpenDatabase/ will be removed and regenerated. Are you sure ? yes/no");
                             askedForYesNo = true;
-                        } 
+                        }
                         else
                         {
                             if (_command == "yes")
@@ -99,6 +121,8 @@ namespace OpenDatabase
                                 JSONHandler.ClearFolder(OpenDatabase.itemsFolder);
                                 JSONHandler.CreateItemFiles();
                                 JSONHandler.CreateRecipeFiles();
+
+                                Console.instance.AddString("JSON Files are regenerated.");
                             }
                             askedForYesNo = false;
                         }
@@ -116,6 +140,7 @@ namespace OpenDatabase
                             {
                                 JSONHandler.ClearFolder(OpenDatabase.itemsFolder);
                                 JSONHandler.CreateItemFiles();
+                                Console.instance.AddString("Item Files are regenerated.");
                             }
                             askedForYesNo = false;
                         }
@@ -133,6 +158,7 @@ namespace OpenDatabase
                             {
                                 JSONHandler.ClearFolder(OpenDatabase.recipeFolder);
                                 JSONHandler.CreateRecipeFiles();
+                                Console.instance.AddString("Recipe Files are regenerated.");
                             }
                             askedForYesNo = false;
                         }

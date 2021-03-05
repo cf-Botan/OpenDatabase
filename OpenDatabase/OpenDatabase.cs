@@ -20,15 +20,18 @@ namespace OpenDatabase
         public static ConfigEntry<bool> modEnabled;
         public static ConfigEntry<bool> showZerosInJSON;
         private static Harmony harmony;
+        private static BaseUnityPlugin baseUnityPlugin;
 
+        public static BaseUnityPlugin instance => baseUnityPlugin;
 
         
         public void Awake()
         {
+            baseUnityPlugin = this;
 
             modEnabled = Config.Bind<bool>("General", "Enabled", true, "Enable this mod");
             showZerosInJSON = Config.Bind<bool>("JSONGenerator", "ShowZerosInJSON", false, "If set to true, all int/float values that are 0 won't be hidden");
-
+            
             if (!modEnabled.Value) return;
 
             JSONHandler.CheckIntegrity();
