@@ -14,15 +14,15 @@ Now run Valheim and join a world. After that go to Valheim/BepInEx/plugins/. The
 Enable or disable the mod.
 If ShowZerosInJSON is set true, Zeros inside of a json file are not removed on generation.
 
-## Configurate Recipes
+## Recipes
 
-This is a example recipe 
+The Club recipe for example looks like this:
 ```json
 {
-	"result_item_id": "",
+	"result_item_id": "Club",
 	"result_amount": 1,
-	"RepairStation": "",
-	"CrafingStation": "",
+	"RepairStation": "$piece_workbench",
+	"CraftingStation": "",
 	"minStationLevel": 1,
 	"ingredients": [
 		{
@@ -30,9 +30,10 @@ This is a example recipe
 			"amount": 6
 		},
 		{
-			"id": "Stone",
+			"id": "BoneFragments",
 			"amount": 0
 		}
 	]
 }
 ```
+You will however not see "CraftingStation": "" empty values are not included in the json generation. This also applies to int/float by default if the value is 0.
