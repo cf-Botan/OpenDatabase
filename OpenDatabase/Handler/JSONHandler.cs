@@ -190,13 +190,6 @@ namespace OpenDatabase.Handler
     }
 
     [Serializable]
-    public class JStation
-    {
-        public string name;
-        public int minStationLevel;
-    }
-
-    [Serializable]
     public class JItemData
     {
         public string m_name;
