@@ -55,6 +55,10 @@ namespace OpenDatabase.Handler
                             recipe.m_craftingStation = station;
                         else
                             Logger.LogError($"Couldn't find CraftingStation {jRecipe.CraftingStation}");
+                    } 
+                    else
+                    {
+                        recipe.m_craftingStation = null;
                     }
 
                     if (jRecipe.RepairStation != null && jRecipe.RepairStation != "")
@@ -64,6 +68,10 @@ namespace OpenDatabase.Handler
                             recipe.m_repairStation = station;
                         else
                             Logger.LogError($"Couldn't find RepairStation {jRecipe.RepairStation}");
+                    }
+                    else
+                    {
+                        recipe.m_repairStation = null;
                     }
 
                     for (int i = 0; i < jRecipe.ingredients.Length; i++)

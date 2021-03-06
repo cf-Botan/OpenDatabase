@@ -2,6 +2,9 @@
 using UnityEngine.SceneManagement;
 using OpenDatabase.Handler;
 using BepInEx.Configuration;
+using UnityEngine;
+using OpenDatabase.Utilities;
+
 namespace OpenDatabase
 {
     [HarmonyPatch]
@@ -75,8 +78,20 @@ namespace OpenDatabase
                 ItemsHandler.ReloadItems();
                 RecipesHandler.ReloadRecipes();
 
+                
                 if (Player.m_localPlayer != null)
+                {
+                    
+                    var list = Player.m_localPlayer.m_inventory.GetAllItems();
+ 
+                    for (int i = 0; i< list.Count; i++)
+                    {
+                        var data = Helper.GetSharedDataBySharedName(list[i].m_shared.m_name);
+                        list[i].m_shared = data;
+                        
+                    }
                     Player.m_localPlayer.UpdateKnownRecipesList();
+                }
 
                 Console.instance.AddString("Database has been reloaded!");
             }

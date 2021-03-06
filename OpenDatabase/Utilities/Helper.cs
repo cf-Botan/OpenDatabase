@@ -1,9 +1,25 @@
 ﻿using OpenDatabase.Handler;
+using UnityEngine;
 
 namespace OpenDatabase.Utilities
 {
     public class Helper
     {
+
+        public static ItemDrop.ItemData.SharedData GetSharedDataBySharedName(string name)
+        {
+            foreach(GameObject obj in ObjectDB.instance.m_items)
+            {
+                ItemDrop drop = obj.GetComponent<ItemDrop>();
+                if (drop != null)
+                {
+                    if (drop.m_itemData.m_shared.m_name == name) return drop.m_itemData.m_shared;
+                }
+            }
+
+            return null;
+        }
+
         public static JItemDrop GetItemDataFromItemDrop(ItemDrop drop)
         {
             JItemDrop jItemDrop = new JItemDrop();
