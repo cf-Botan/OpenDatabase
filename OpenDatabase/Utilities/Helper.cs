@@ -131,6 +131,7 @@ namespace OpenDatabase.Utilities
                 damages.m_blunt = data.m_damages.m_blunt;
                 damages.m_chop = data.m_damages.m_chop;
                 damages.m_damage = data.m_damages.m_damage;
+                damages.m_fire = data.damages.m_fire;
                 damages.m_frost = data.m_damages.m_frost;
                 damages.m_lightning = data.m_damages.m_lightning;
                 damages.m_pickaxe = data.m_damages.m_pickaxe;
@@ -147,6 +148,7 @@ namespace OpenDatabase.Utilities
                 damagesPerLevel.m_blunt = data.m_damagesPerLevel.m_blunt;
                 damagesPerLevel.m_chop = data.m_damagesPerLevel.m_chop;
                 damagesPerLevel.m_damage = data.m_damagesPerLevel.m_damage;
+                damagesPerLevel.m_fire = data.m_damagesPerLevel.m_fire;
                 damagesPerLevel.m_frost = data.m_damagesPerLevel.m_frost;
                 damagesPerLevel.m_lightning = data.m_damagesPerLevel.m_lightning;
                 damagesPerLevel.m_pickaxe = data.m_damagesPerLevel.m_pickaxe;
