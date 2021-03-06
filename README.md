@@ -14,6 +14,14 @@ Now run Valheim and join a world. After that go to Valheim/BepInEx/plugins/. The
 Enable or disable the mod.
 If ShowZerosInJSON is set true, Zeros inside of a json file are not removed on generation.
 
+## Planned features
+
+- [x] Able to modify item data.
+- [x] Able to modify recipes.
+- [ ] Able to modify effects
+- [ ] Custom items
+- [ ] Custom recipes
+
 ## Recipes
 
 The Club recipe for example looks like this:
