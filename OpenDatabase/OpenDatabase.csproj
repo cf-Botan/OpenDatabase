@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Handler\ItemsHandler.cs" />
     <Compile Include="Handler\RecipesHandler.cs" />
+    <Compile Include="Handler\SEHandler.cs" />
     <Compile Include="OpenDatabase.cs" />
     <Compile Include="Utilities\ColorUtil.cs" />
     <Compile Include="Utilities\Helper.cs" />
