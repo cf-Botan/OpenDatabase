@@ -191,9 +191,10 @@ namespace OpenDatabase.Handler
                     jStatusEffect.m_attributes.SailingPower = true;
                 }
 
-                SE_Stats stats = effect as SE_Stats;
-                if (stats != null)
+                
+                if (effect is SE_Stats)
                 {
+                    SE_Stats stats = effect as SE_Stats;
                     jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
                     jStatusEffect.instance_of.SE_Stats = new JStatusEffect.JStatusInstance.JSE_Stats()
                     {
