@@ -57,7 +57,7 @@ namespace OpenDatabase
             {
                 Console.instance.AddString("");
                 Console.instance.AddString("[OpenDatabase]");
-                Console.instance.AddString("opendatabase.generate all/items/recipes - Regenerates JSON files");
+                Console.instance.AddString("opendatabase.generate all/items/recipes/effects - Regenerates JSON files");
                 Console.instance.AddString("opendatabase.reload - Reloads the database");
                 Console.instance.AddString("opendatabase.config.reload - Reloads the config file");
             }
@@ -174,6 +174,24 @@ namespace OpenDatabase
                                 JSONHandler.ClearFolder(OpenDatabase.recipeFolder);
                                 JSONHandler.CreateRecipeFiles();
                                 Console.instance.AddString("Recipe Files are regenerated.");
+                            }
+                            askedForYesNo = false;
+                        }
+                    }
+                    else if (cmd[1] == "effects")
+                    {
+                        if (!askedForYesNo)
+                        {
+                            Console.instance.AddString("All files inside plugins/OpenDatabase/StatusEffects will be removed and regenerated. Are you sure ? yes/no");
+                            askedForYesNo = true;
+                        }
+                        else
+                        {
+                            if (_command == "yes")
+                            {
+                                JSONHandler.ClearFolder(OpenDatabase.statusEffectsFolder);
+                                JSONHandler.CreateStatusEffectsFiles();
+                                Console.instance.AddString("StatusEffect Files are regenerated.");
                             }
                             askedForYesNo = false;
                         }

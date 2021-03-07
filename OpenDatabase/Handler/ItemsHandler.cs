@@ -1,4 +1,5 @@
-﻿using OpenDatabase.Utilities;
+﻿using OpenDatabase.JSONObjects;
+using OpenDatabase.Utilities;
 using UnityEngine;
 
 namespace OpenDatabase.Handler

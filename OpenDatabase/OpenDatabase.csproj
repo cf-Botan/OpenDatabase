@@ -69,6 +69,9 @@
     <Compile Include="Handler\ItemsHandler.cs" />
     <Compile Include="Handler\RecipesHandler.cs" />
     <Compile Include="Handler\SEHandler.cs" />
+    <Compile Include="JSONObjects\JItemDrop.cs" />
+    <Compile Include="JSONObjects\JRecipe.cs" />
+    <Compile Include="JSONObjects\JStatusEffect.cs" />
     <Compile Include="OpenDatabase.cs" />
     <Compile Include="Utilities\ColorUtil.cs" />
     <Compile Include="Utilities\Helper.cs" />

@@ -1,4 +1,4 @@
-﻿using OpenDatabase.Handler;
+﻿using OpenDatabase.JSONObjects;
 using UnityEngine;
 
 namespace OpenDatabase.Utilities
@@ -28,11 +28,11 @@ namespace OpenDatabase.Utilities
             return jItemDrop;
         }
 
-        public static JItemData GetItemDataFromItemDrop(ItemDrop.ItemData data)
+        public static JItemDrop.JItemData GetItemDataFromItemDrop(ItemDrop.ItemData data)
         {
-            JItemData itemData;
+            JItemDrop.JItemData itemData;
 
-            JDamages damages = null;
+            JItemDrop.JItemData.JDamages damages = null;
             if (data.m_shared.m_damages.m_blunt > 0 || data.m_shared.m_damages.m_chop > 0 ||
                 data.m_shared.m_damages.m_damage > 0 || data.m_shared.m_damages.m_fire > 0 ||
                 data.m_shared.m_damages.m_frost > 0 || data.m_shared.m_damages.m_lightning > 0 ||
@@ -40,7 +40,7 @@ namespace OpenDatabase.Utilities
                 data.m_shared.m_damages.m_poison > 0 || data.m_shared.m_damages.m_slash > 0 ||
                 data.m_shared.m_damages.m_spirit > 0)
             {
-                damages = new JDamages()
+                damages = new JItemDrop.JItemData.JDamages()
                 {
                     m_blunt = data.m_shared.m_damages.m_blunt,
                     m_chop = data.m_shared.m_damages.m_chop,
@@ -56,7 +56,7 @@ namespace OpenDatabase.Utilities
                 };
             }
 
-            JDamages damagesPerLevel = null;
+            JItemDrop.JItemData.JDamages damagesPerLevel = null;
             if (data.m_shared.m_damagesPerLevel.m_blunt > 0 || data.m_shared.m_damagesPerLevel.m_chop > 0 ||
                 data.m_shared.m_damagesPerLevel.m_damage > 0 || data.m_shared.m_damagesPerLevel.m_fire > 0 ||
                 data.m_shared.m_damagesPerLevel.m_frost > 0 || data.m_shared.m_damagesPerLevel.m_lightning > 0 ||
@@ -64,7 +64,7 @@ namespace OpenDatabase.Utilities
                 data.m_shared.m_damagesPerLevel.m_poison > 0 || data.m_shared.m_damagesPerLevel.m_slash > 0 ||
                 data.m_shared.m_damagesPerLevel.m_spirit > 0)
             {
-                damagesPerLevel = new JDamages()
+                damagesPerLevel = new JItemDrop.JItemData.JDamages()
                 {
                     m_blunt = data.m_shared.m_damagesPerLevel.m_blunt,
                     m_chop = data.m_shared.m_damagesPerLevel.m_chop,
@@ -81,7 +81,7 @@ namespace OpenDatabase.Utilities
             }
 
 
-            itemData = new JItemData()
+            itemData = new JItemDrop.JItemData()
             {
                 m_armor = data.m_shared.m_armor,
                 m_armorPerLevel = data.m_shared.m_armorPerLevel,
@@ -116,14 +116,16 @@ namespace OpenDatabase.Utilities
                 m_name = data.m_shared.m_name,
                 m_questItem = data.m_shared.m_questItem,
                 m_teleportable = data.m_shared.m_teleportable,
-                m_timedBlockBonus = data.m_shared.m_timedBlockBonus
+                m_timedBlockBonus = data.m_shared.m_timedBlockBonus,
+                m_equipStatusEffect = data.m_shared.m_equipStatusEffect?.name,
+                m_setStatusEffect = data.m_shared.m_setStatusEffect?.name
             };
             if (itemData.m_food == 0 && itemData.m_foodRegen == 0 && itemData.m_foodStamina == 0)
                 itemData.m_foodColor = null;
             return itemData;
         }
 
-        public static void SetItemDropDataFromJItemData(ref ItemDrop.ItemData itemData, JItemData data)
+        public static void SetItemDropDataFromJItemData(ref ItemDrop.ItemData itemData, JItemDrop.JItemData data)
         {
             if (data.m_damages != null)
             {

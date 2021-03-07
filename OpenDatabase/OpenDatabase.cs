@@ -15,6 +15,7 @@ namespace OpenDatabase
         public static string jsonFolder = Path.Combine(assemblyFolder, "OpenDatabase");
         public static string recipeFolder = Path.Combine(jsonFolder, "Recipes");
         public static string itemsFolder = Path.Combine(jsonFolder, "Items");
+        public static string statusEffectsFolder = Path.Combine(jsonFolder, "StatusEffects");
 
 
         public static ConfigEntry<bool> modEnabled;
