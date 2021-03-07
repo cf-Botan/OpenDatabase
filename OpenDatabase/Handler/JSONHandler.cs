@@ -61,6 +61,7 @@ namespace OpenDatabase.Handler
 
                 JRecipe jr = new JRecipe();
 
+                jr.recipe_id = recipe.name;
                 jr.result_item_id = recipe.m_item.gameObject.name;
                 jr.result_amount = recipe.m_amount;
 
@@ -80,6 +81,7 @@ namespace OpenDatabase.Handler
                     jr.ingredients[i].id = recipe.m_resources[i].m_resItem.gameObject.name;
                 }
 
+                
                 string json = TinyJson.JSONWriter.ToJson(jr);
                 json = JsonFormatter.Format(json, !OpenDatabase.showZerosInJSON.Value);
                 File.WriteAllText(OpenDatabase.recipeFolder + "/" + recipe.name + ".json", json);
@@ -119,6 +121,8 @@ namespace OpenDatabase.Handler
                 if (!f.EndsWith(".json")) continue;
                 string content = File.ReadAllText(f);
                 JRecipe jRecipe = content.FromJson<JRecipe>();
+
+                jRecipe.recipe_id = Path.GetFileNameWithoutExtension(f);
                 recipes.Add(jRecipe);
                 
             }
@@ -143,7 +147,7 @@ namespace OpenDatabase.Handler
         public static JRecipe GetJRecipeById(string id)
         {
             foreach (JRecipe j in recipes)
-                if (j.result_item_id == id)
+                if (j.recipe_id == id)
                     return j;
 
             return null;
@@ -162,6 +166,7 @@ namespace OpenDatabase.Handler
     [Serializable]
     public class JRecipe
     {
+        public string recipe_id;
         public string result_item_id;
         public int result_amount;
         

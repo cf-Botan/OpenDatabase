@@ -39,7 +39,7 @@ namespace OpenDatabase.Handler
             {
                 if (recipe.m_item == null) continue;
 
-                JRecipe jRecipe = JSONHandler.GetJRecipeById(recipe.m_item.gameObject.name);
+                JRecipe jRecipe = JSONHandler.GetJRecipeById(recipe.name);
                 if (jRecipe != null)
                 {
                     Logger.Log($"Loaded {jRecipe.result_item_id} with {jRecipe.ingredients.Length} ingredients");
