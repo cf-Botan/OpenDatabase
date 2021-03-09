@@ -55,6 +55,7 @@ namespace OpenDatabase.Handler
                             recipe.m_craftingStation = station;
                         else
                             Logger.LogError($"Couldn't find CraftingStation {jRecipe.CraftingStation}");
+
                     } 
                     else
                     {
@@ -80,6 +81,7 @@ namespace OpenDatabase.Handler
                         recipe.m_resources[i] = new Piece.Requirement();
                         recipe.m_resources[i].m_amount = jRecipe.ingredients[i].amount;
                         recipe.m_resources[i].m_resItem = _drop;
+                        recipe.m_resources[i].m_amountPerLevel = jRecipe.ingredients[i].amountPerLevel;
                     }
                 }
             }

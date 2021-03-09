@@ -79,6 +79,8 @@ namespace OpenDatabase.Handler
 
                     jr.ingredients[i].amount = recipe.m_resources[i].m_amount;
                     jr.ingredients[i].id = recipe.m_resources[i].m_resItem.gameObject.name;
+                    jr.ingredients[i].amountPerLevel = recipe.m_resources[i].m_amountPerLevel;
+
                 }
 
                 
@@ -124,7 +126,6 @@ namespace OpenDatabase.Handler
 
                 jRecipe.recipe_id = Path.GetFileNameWithoutExtension(f);
                 recipes.Add(jRecipe);
-                
             }
         }
 
@@ -192,6 +193,7 @@ namespace OpenDatabase.Handler
     {
         public string id;
         public int amount;
+        public int amountPerLevel;
     }
 
     [Serializable]
