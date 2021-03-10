@@ -83,6 +83,7 @@ namespace OpenDatabase.Handler
                 {
                     jr.ingredients[i] = new JRecipe.JIngredients();
 
+                    jr.ingredients[i].amountPerLevel = recipe.m_resources[i].m_amountPerLevel;
                     jr.ingredients[i].amount = recipe.m_resources[i].m_amount;
                     jr.ingredients[i].id = recipe.m_resources[i].m_resItem.gameObject.name;
                 }
