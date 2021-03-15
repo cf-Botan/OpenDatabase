@@ -2,8 +2,10 @@
 using UnityEngine.SceneManagement;
 using OpenDatabase.Handler;
 using BepInEx.Configuration;
-using UnityEngine;
+
 using OpenDatabase.Utilities;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace OpenDatabase
 {
@@ -19,7 +21,7 @@ namespace OpenDatabase
         {
             if (SceneManager.GetActiveScene().name != "main") return;
 
-            Player.m_localPlayer.UpdateKnownRecipesList();
+            Player.m_localPlayer?.UpdateKnownRecipesList();
         }
 
         [HarmonyPrefix]
@@ -43,8 +45,9 @@ namespace OpenDatabase
 
             ItemsHandler.ReloadItems();
             RecipesHandler.ReloadRecipes();
-            
+
         }
+
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Console), "InputText")]

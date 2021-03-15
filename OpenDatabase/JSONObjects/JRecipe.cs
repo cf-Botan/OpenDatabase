@@ -22,6 +22,7 @@ namespace OpenDatabase.JSONObjects
             public string id;
             public int amount;
             public int amountPerLevel;
+            public bool recover;
         }
     }
 }

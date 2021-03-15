@@ -44,6 +44,18 @@ namespace OpenDatabase.JSONObjects
         public class JStatusInstance
         {
             public JSE_Stats SE_Stats;
+            public JSE_Burning SE_Burning;
+            public JSE_Cozy SE_Cozy;
+            public JSE_Finder SE_Finder;
+            public JSE_Frost SE_Frost;
+            public JSE_Harpooned SE_Harpooned;
+            public JSE_HealthUpgrade SE_HealthUpgrade; 
+            public JSE_Poison SE_Poison;
+            public JSE_Rested SE_Rested;
+            public JSE_Shield SE_Shield;
+            public JSE_Smoke SE_Smoke;
+            public JSE_Spawn SE_Spawn;
+            public JSE_Wet SE_Wet;
 
             [Serializable]
             public class JSE_Stats
@@ -67,8 +79,98 @@ namespace OpenDatabase.JSONObjects
                 public float m_stealthModifier;
                 public float m_addMaxCarryWeight;
             }
-        }
 
+            [Serializable]
+            public class JSE_Burning
+            {
+                public float m_damageInterval;
+            }
+
+            [Serializable]
+            public class JSE_Cozy
+            {
+                public float m_delay;
+                public string m_statusEffect;
+            }
+
+            [Serializable]
+            public class JSE_Finder
+            {
+                public float m_closerTriggerDistance;
+                public float m_furtherTriggerDistance;
+                public float m_closeFrequency;
+                public float m_distantFrequency;
+            }
+
+            [Serializable]
+            public class JSE_Frost
+            {
+                public float m_freezeTimeEnemy;
+                public float m_freezeTimePlayer;
+                public float m_minSpeedFactor;
+            }
+
+            [Serializable]
+            public class JSE_Harpooned
+            {
+                public float m_minForce;
+                public float m_maxForce;
+                public float m_minDistance;
+                public float m_maxDistance;
+                public float m_staminaDrain;
+                public float m_staminaDrainInterval;
+                public float m_maxMass;
+            }
+
+            [Serializable]
+            public class JSE_HealthUpgrade
+            {
+                public float m_moreHealth;
+                public float m_moreStamina;
+            }
+
+            [Serializable]
+            public class JSE_Poison
+            {
+                public float m_damageInterval;
+                public float m_baseTTL;
+                public float m_TTLPerDamagePlayer;
+                public float m_TTLPerDamage;
+                public float m_TTLPower;
+            }
+
+            [Serializable]
+            public class JSE_Rested
+            {
+                public float m_baseTTL;
+                public float m_TTLPerComfortLevel;
+            }
+
+            [Serializable]
+            public class JSE_Shield
+            {
+                public float m_absorbDamage;
+            }
+
+            [Serializable]
+            public class JSE_Smoke
+            {
+                public float m_damageInterval;
+            }
+
+            [Serializable]
+            public class JSE_Spawn
+            {
+                public float m_delay;
+            }
+
+            [Serializable]
+            public class JSE_Wet
+            {
+                public float m_waterDamage;
+                public float m_damageInterval;
+            }
+        }
 
         [Serializable]
         public class StatusAttribute

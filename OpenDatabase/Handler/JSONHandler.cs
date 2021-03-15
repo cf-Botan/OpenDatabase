@@ -7,6 +7,7 @@ using OpenDatabase.Utilities.Formatter;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using OpenDatabase.JSONObjects;
+using System.Linq;
 
 namespace OpenDatabase.Handler
 {
@@ -25,6 +26,7 @@ namespace OpenDatabase.Handler
                 Directory.CreateDirectory(OpenDatabase.recipeFolder);
                 Directory.CreateDirectory(OpenDatabase.itemsFolder);
                 Directory.CreateDirectory(OpenDatabase.statusEffectsFolder);
+                Directory.CreateDirectory(OpenDatabase.piecesFolder);
                 wasBlank = true;
             }
             else
@@ -37,6 +39,9 @@ namespace OpenDatabase.Handler
 
                 if (!Directory.Exists(OpenDatabase.statusEffectsFolder))
                     Directory.CreateDirectory(OpenDatabase.statusEffectsFolder);
+
+                if (!Directory.Exists(OpenDatabase.piecesFolder))
+                    Directory.CreateDirectory(OpenDatabase.piecesFolder);
 
             }
 
@@ -103,10 +108,11 @@ namespace OpenDatabase.Handler
             foreach (GameObject obj in ObjectDB.instance.m_items)
             {
                 ItemDrop itemDrop = obj.GetComponent<ItemDrop>();
+                Piece piece = obj.GetComponent<Piece>();
+
                 if (itemDrop != null)
                 {
-                    JItemDrop jItemDrop = new JItemDrop();
-
+                    
                     Logger.Log($"Generated Item '{itemDrop.name}'");
                     JItemDrop jItemData = Helper.GetItemDataFromItemDrop(itemDrop);
                     string json = TinyJson.JSONWriter.ToJson(jItemData);
@@ -171,21 +177,21 @@ namespace OpenDatabase.Handler
                 }
 
                 jStatusEffect.m_cooldown = effect.m_cooldown;
-                jStatusEffect.m_activationAnimation = effect.m_activationAnimation;
+                //jStatusEffect.m_activationAnimation = effect.m_activationAnimation;
 
-                if ((effect.m_attributes & StatusEffect.StatusAttribute.ColdResistance) == StatusEffect.StatusAttribute.ColdResistance)
+                if (effect.m_attributes.HasFlag(StatusEffect.StatusAttribute.ColdResistance))
                 {
                     if (jStatusEffect.m_attributes == null)
                         jStatusEffect.m_attributes = new JStatusEffect.StatusAttribute();
                     jStatusEffect.m_attributes.ColdResistance = true;
                 }
-                if ((effect.m_attributes & StatusEffect.StatusAttribute.DoubleImpactDamage) == StatusEffect.StatusAttribute.DoubleImpactDamage)
+                if (effect.m_attributes.HasFlag(StatusEffect.StatusAttribute.DoubleImpactDamage))
                 {
                     if (jStatusEffect.m_attributes == null)
                         jStatusEffect.m_attributes = new JStatusEffect.StatusAttribute();
                     jStatusEffect.m_attributes.DoubleImpactDamage = true;
                 }
-                if ((effect.m_attributes & StatusEffect.StatusAttribute.SailingPower) == StatusEffect.StatusAttribute.SailingPower)
+                if (effect.m_attributes.HasFlag(StatusEffect.StatusAttribute.SailingPower))
                 {
                     if (jStatusEffect.m_attributes == null)
                         jStatusEffect.m_attributes = new JStatusEffect.StatusAttribute();
@@ -218,11 +224,157 @@ namespace OpenDatabase.Handler
                         m_stealthModifier = stats.m_stealthModifier,
                         m_tickInterval = stats.m_tickInterval
                     };
+                } 
+                else if (effect is SE_Burning)
+                {
+                    SE_Burning burning = effect as SE_Burning;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Burning = new JStatusEffect.JStatusInstance.JSE_Burning()
+                    {
+                        m_damageInterval = burning.m_damageInterval
+                    };
+                }
+                else if (effect is SE_Cozy)
+                {
+                    SE_Cozy cozy = effect as SE_Cozy;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Cozy = new JStatusEffect.JStatusInstance.JSE_Cozy()
+                    {
+                        m_delay = cozy.m_delay,
+                        m_statusEffect = cozy.m_statusEffect
+                    };
+                }
+                else if (effect is SE_Finder)
+                {
+                    SE_Finder finder = effect as SE_Finder;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Finder = new JStatusEffect.JStatusInstance.JSE_Finder()
+                    {
+                        m_closeFrequency = finder.m_closeFrequency,
+                        m_closerTriggerDistance = finder.m_closerTriggerDistance,
+                        m_distantFrequency = finder.m_distantFrequency,
+                        m_furtherTriggerDistance = finder.m_furtherTriggerDistance
+                    };
+                }
+                else if (effect is SE_Frost)
+                {
+                    SE_Frost frost = effect as SE_Frost;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Frost = new JStatusEffect.JStatusInstance.JSE_Frost()
+                    {
+                        m_freezeTimeEnemy = frost.m_freezeTimeEnemy,
+                        m_freezeTimePlayer = frost.m_freezeTimePlayer,
+                        m_minSpeedFactor = frost.m_minSpeedFactor
+                    };
+                }
+                else if (effect is SE_Harpooned)
+                {
+                    SE_Harpooned harpooned = effect as SE_Harpooned;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Harpooned = new JStatusEffect.JStatusInstance.JSE_Harpooned()
+                    {
+                        m_maxDistance = harpooned.m_maxDistance,
+                        m_maxForce = harpooned.m_maxForce,
+                        m_maxMass = harpooned.m_maxMass,
+                        m_minDistance = harpooned.m_minDistance,
+                        m_minForce = harpooned.m_minForce,
+                        m_staminaDrain = harpooned.m_staminaDrain,
+                        m_staminaDrainInterval = harpooned.m_staminaDrainInterval
+                    };
+                }
+                else if (effect is SE_HealthUpgrade)
+                {
+                    SE_HealthUpgrade health = effect as SE_HealthUpgrade;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_HealthUpgrade = new JStatusEffect.JStatusInstance.JSE_HealthUpgrade()
+                    {
+                        m_moreHealth = health.m_moreHealth,
+                        m_moreStamina = health.m_moreStamina
+                    };
+                }
+                else if (effect is SE_Poison)
+                {
+                    SE_Poison poison = effect as SE_Poison;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Poison = new JStatusEffect.JStatusInstance.JSE_Poison()
+                    {
+                        m_baseTTL = poison.m_baseTTL,
+                        m_damageInterval = poison.m_damageInterval,
+                        m_TTLPerDamage = poison.m_TTLPerDamage,
+                        m_TTLPerDamagePlayer = poison.m_TTLPerDamagePlayer,
+                        m_TTLPower = poison.m_TTLPower
+                    };
+                }
+                else if (effect is SE_Rested)
+                {
+                    SE_Rested rested = effect as SE_Rested;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Rested = new JStatusEffect.JStatusInstance.JSE_Rested()
+                    {
+                        m_baseTTL = rested.m_baseTTL,
+                        m_TTLPerComfortLevel = rested.m_TTLPerComfortLevel
+                    };
+                }
+                else if (effect is SE_Shield)
+                {
+                    SE_Shield shield = effect as SE_Shield;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Shield = new JStatusEffect.JStatusInstance.JSE_Shield()
+                    {
+                        m_absorbDamage = shield.m_absorbDamage
+                    };
+                }
+                else if (effect is SE_Smoke)
+                {
+                    SE_Smoke smoke = effect as SE_Smoke;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Smoke = new JStatusEffect.JStatusInstance.JSE_Smoke()
+                    {
+                        m_damageInterval = smoke.m_damageInterval
+                    };
+                }
+                else if (effect is SE_Spawn)
+                {
+                    SE_Spawn spawn = effect as SE_Spawn;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Spawn = new JStatusEffect.JStatusInstance.JSE_Spawn()
+                    {
+                        m_delay = spawn.m_delay
+                    };
+                }
+                else if (effect is SE_Wet)
+                {
+                    SE_Wet wet = effect as SE_Wet;
+                    jStatusEffect.instance_of = new JStatusEffect.JStatusInstance();
+                    jStatusEffect.instance_of.SE_Wet = new JStatusEffect.JStatusInstance.JSE_Wet()
+                    {
+                        m_damageInterval = wet.m_damageInterval,
+                        m_waterDamage = wet.m_waterDamage
+                    };
                 }
 
                 string json = TinyJson.JSONWriter.ToJson(jStatusEffect);
                 json = JsonFormatter.Format(json, !OpenDatabase.showZerosInJSON.Value);
                 File.WriteAllText(OpenDatabase.statusEffectsFolder + "/" + effect.name + ".json", json);
+            }
+        }
+
+        public static void CreatePieceFiles()
+        {
+            Piece[] pieces = Resources.FindObjectsOfTypeAll(typeof(Piece)) as Piece[];
+            foreach(Piece piece in pieces)
+            {
+                Array c_list = Enum.GetValues(typeof(Piece.PieceCategory))
+                    .Cast<Piece.PieceCategory>()
+                    .Where(m => piece.m_category.HasFlag(m)).ToArray();
+
+                JPiece jPiece = new JPiece()
+                {
+                    m_allowAltGroundPlacement = piece.m_allowAltGroundPlacement,
+                    m_allowedInDungeons = piece.m_allowedInDungeons,
+                    m_canBeRemoved = piece.m_canBeRemoved,
+                    m_category = string.Join(",", c_list)
+                };
             }
         }
 

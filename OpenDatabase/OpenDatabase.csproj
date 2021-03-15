@@ -70,6 +70,7 @@
     <Compile Include="Handler\RecipesHandler.cs" />
     <Compile Include="Handler\SEHandler.cs" />
     <Compile Include="JSONObjects\JItemDrop.cs" />
+    <Compile Include="JSONObjects\JPiece.cs" />
     <Compile Include="JSONObjects\JRecipe.cs" />
     <Compile Include="JSONObjects\JStatusEffect.cs" />
     <Compile Include="OpenDatabase.cs" />
