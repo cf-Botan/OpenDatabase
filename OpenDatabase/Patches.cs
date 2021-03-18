@@ -19,7 +19,7 @@ namespace OpenDatabase
         {
             if (SceneManager.GetActiveScene().name != "main") return;
 
-            Player.m_localPlayer.UpdateKnownRecipesList();
+            Player.m_localPlayer?.UpdateKnownRecipesList();
         }
 
         [HarmonyPrefix]
